@@ -25,21 +25,14 @@
 
 
 from openpyxl import Workbook,load_workbook
-from openpyxl.reader.drawings import  find_images
-# from  zipfile import ZipFile
+
 import os
 import zipfile
 import re
-from openpyxl.packaging.relationship import (
-    RelationshipList,
-    get_dependents,
-    get_rels_path,
-)
 
 import shutil
 import re 
 import os 
-# from cgai_io import deldir,delall
 
 ROOT = os.path.dirname(__file__)
 
@@ -93,7 +86,6 @@ def get_image_path(excel_path,extract_dirpath=EXTPATH):
     global EXTPATH
     EXTPATH = extract_dirpath
     image_name_map = get_image_name(excel_path,extract_dirpath)
-    # print(image_name_map)
     xml_path = ''
     xml_path1 = os.path.join(extract_dirpath,'xl/cellimages.xml')
     xml_path2 = os.path.join(extract_dirpath,'xl/drawings/drawing1.xml')
@@ -136,19 +128,17 @@ def get_excel_data(excel_path,extract_dirpath=EXTPATH):
     ws = wb.active
     rows = ws.max_row
     columns = ws.max_column
-    # print(ws['A1'].coordinate)
-    # print(ws.cell(1,1).coordinate)
     header_row = ws[1]
     header = [h.value for h in header_row]
-    # print(header)
 
     image_map = get_image_path(excel_path,extract_dirpath)
     data_list = []
-    for r in range(1,rows+1):
+    for r in range(2,rows+1):
         per_row_data = []
         for c in range(1,columns+1):
             cood = ws.cell(r,c).coordinate
             value = ws.cell(r,c).value
+            value = str(value) if value else ''
             image_path = image_map.get(cood,'')
             value = 'img:' + image_path if image_path else value
             per_row_data.append(value)
@@ -159,61 +149,5 @@ def get_excel_data(excel_path,extract_dirpath=EXTPATH):
     wb.close()
 
     return data
-
-
-
-# # path = r'F:\Temp\Q\AA.xlsx'
-# path = r'F:\Temp\Q\excel_module.xlsx'
-# extract_dirpath = r'F:\Temp\Q\Atemp'
-# # extract_excel(r'C:\Temp\output\test.xlsx')
-# # image_name = get_image_name()
-# image_id = get_image_path(path,extract_dirpath)
-# print(image_id)
-# # clearTemp()
-
-#
-# s = ''
-# with open(path,'r',encoding='utf8') as r:
-#     s = r.read()
-
-
-# pattern = re.compile('.*?<c r="([A-Z]+\d+)".*?_xlfn.DISPIMG\(&quot;(.*)?&quot.*')
-# pattern = re.compile('<c r="([A-Z]+\d+)" t="str"><f>_xlfn.DISPIMG\(&quot;(\w+)&quot;,1\)</f>')
-
-# result = pattern.findall(s)
-# print(len(result))
-# print(result)
-
-
-# os.path.dirname()
-
-# path = r'C:\Users\Admin\Downloads\A.xlsx'
-# path = r'C:\Temp\output\test.xlsx'
-# path = r'F:\Temp\Q\B.xlsx'
-# zip = zipfile.ZipFile(path)
-# zip.extractall(r'C:\Temp\output\test')
-# zip.extractall(r'F:\Temp\Q\B')
-
-# fz = zipfile.ZipFile(path, 'r')
-# # xml_name = 'xl/drawings/drawing1.xml'
-# xml_name = 'xl/drawings/drawing1.xml'
-# rc = []
-# if xml_name in fz.namelist():
-#     xml_string = fz.read(xml_name).decode()
-#     images_row_numbers = re.findall(r'<xdr:row>(\d+)</xdr:row>', xml_string)
-#     images_col_numbers = re.findall(r'<xdr:col>(\d+)</xdr:col>', xml_string)
-#     embeds = re.findall(r'<a:blip r:embed="rId(\d+)"/', xml_string)
-#     # print(embeds)
-#     if images_row_numbers and images_col_numbers:
-
-#         res = list(map(int, images_row_numbers))
-#         clos = list(map(int, images_col_numbers))
-#         embed = list(map(int, embeds))
-# fz.close()
-# res = [r + 1 for r in res]
-# rc = zip(res,clos,embed)
-# print(list(rc))
-
-
 
 
