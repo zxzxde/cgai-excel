@@ -95,6 +95,8 @@ def get_image_path(excel_path,extract_dirpath=EXTPATH):
         xml_path = xml_path2
     image_id_map = {}
     media_path = os.path.join(extract_dirpath,'xl/media')
+    if not os.path.exists(media_path):
+        return image_id_map
     images = os.listdir(media_path)
     if xml_path:
         s = ''
