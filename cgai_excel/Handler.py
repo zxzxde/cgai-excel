@@ -32,7 +32,9 @@ import re
 
 import shutil
 import re 
-import os 
+import os
+
+from pip import main 
 
 ROOT = os.path.dirname(__file__)
 
@@ -66,7 +68,7 @@ def get_image_name(excel_path,extract_dirpath=EXTPATH):
     extract_excel(excel_path,extract_dirpath)
     result = []
     sheet_path = os.path.join(extract_dirpath,'xl/worksheets/sheet1.xml')
-    print('sheet_path:',sheet_path)
+    # print('sheet_path:',sheet_path)
     if os.path.exists(sheet_path):
         s = ''
         with open(sheet_path,'r',encoding='utf8') as r:
@@ -153,3 +155,60 @@ def get_excel_data(excel_path,extract_dirpath=EXTPATH):
     return data
 
 
+def get_text_data(excel_path):
+    """
+    获取纯文本数据
+    """
+
+    data = {}
+    wb = load_workbook(excel_path,data_only=True)
+    ws = wb.active
+    rows = ws.max_row
+    columns = ws.max_column
+    header_row = ws[1]
+    header = [h.value for h in header_row]
+
+    data_list = []
+    for r in range(2,rows+1):
+        per_row_data = []
+        for c in range(1,columns+1):
+            value = ws.cell(r,c).value
+            value = str(value) if value else ''
+            per_row_data.append(value)
+        data_list.append(per_row_data)
+
+    data['header'] = header
+    data['data_list'] = data_list
+    wb.close()
+
+    return data
+
+
+def convert_dict_data(excel_data):
+    """
+    转化成 [{'header':xx,...},{}] 字段作为元素
+    """
+    dict_data_list = []
+    if excel_data:
+        header = excel_data['header']
+        data_list = excel_data['data_list']
+
+        for r in range(len(data_list)):
+            dict_data = {}
+            data = data_list[r]
+            for h in range(len(data)):
+                dict_data[header[h]] = data[h]
+            dict_data_list.append(dict_data)
+    
+    return dict_data_list
+
+
+
+
+# if __name__ == "__main__":
+    
+#     path = r'C:\Users\Admin\Desktop\西行纪解算任务表.xlsx'
+#     text_data = get_text_data(path)
+#     print(text_data)
+#     dict_data = convert_dict_data(text_data)
+#     print(dict_data)
